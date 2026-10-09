@@ -10,6 +10,7 @@ class Car:
         self.direction=direction  # 1=down, -1=up
         self.speed=speed
         self.color=random.choice(COLORS)
+        self.hit=False  # True once this car has cost the player a life (one life per car)
 
     def update(self):
         self.rect.y+=self.direction*self.speed

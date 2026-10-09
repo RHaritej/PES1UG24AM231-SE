@@ -8,6 +8,9 @@ WIDTH=LANES*LANE_W
 HEIGHT=600
 FPS=60
 BG=(60,60,60)
+MAX_LIVES=3
+HIT_FLASH_FRAMES=12   # how long the red "you got hit" tint lasts
+HEART_SPACING=26
 
 class GameEngine:
     def __init__(self):
@@ -16,7 +19,10 @@ class GameEngine:
         pygame.display.set_caption("Traffic Escape")
         self.clock=pygame.time.Clock()
         self.font=pygame.font.SysFont("monospace",24,bold=True)
+        self.hud_font=pygame.font.SysFont("monospace",20,bold=True)  # smaller so the hearts fit in the HUD bar
         self.big_font=pygame.font.SysFont("monospace",44,bold=True)
+        self.flash=pygame.Surface((WIDTH,HEIGHT),pygame.SRCALPHA)
+        self.flash.fill((220,40,40,80))
         self.reset()
 
     def reset(self):
@@ -26,6 +32,8 @@ class GameEngine:
         self.spawn_interval=50
         self.speed=3
         self.score=0
+        self.lives=MAX_LIVES
+        self.hit_flash=0
         self.game_over=False
         self.won=False
 
@@ -36,6 +44,7 @@ class GameEngine:
         return True
 
     def update(self):
+        if self.hit_flash>0: self.hit_flash-=1
         if self.game_over or self.won: return
         keys=pygame.key.get_pressed()
         self.player.move(keys,0,WIDTH)
@@ -47,12 +56,17 @@ class GameEngine:
             self.spawn_interval=max(22,self.spawn_interval-0.2)
         for c in self.cars:
             c.update()
-            if c.rect.colliderect(self.player.rect):
-                self.game_over=True
+            # each car can take at most one life, even if it overlaps the player for many frames
+            if not c.hit and c.rect.colliderect(self.player.rect):
+                c.hit=True
+                self.lives=max(0,self.lives-1)
+                self.hit_flash=HIT_FLASH_FRAMES
+                if self.lives==0:
+                    self.game_over=True
         self.cars=[c for c in self.cars if not c.off_screen(HEIGHT)]
         self.score+=1
         if self.score%300==0: self.speed=min(10,self.speed+0.5)
-        if self.player.rect.top<=10:
+        if not self.game_over and self.player.rect.top<=10:
             self.won=True
 
     def draw(self):
@@ -68,15 +82,29 @@ class GameEngine:
         pygame.draw.rect(self.screen,(150,130,110),pygame.Rect(0,0,WIDTH,30))
         for c in self.cars: c.draw(self.screen)
         self.player.draw(self.screen)
+        if self.hit_flash>0: self.screen.blit(self.flash,(0,0))
         hud=pygame.Rect(0,0,WIDTH,30)
         pygame.draw.rect(self.screen,(20,20,20),hud)
-        s=self.font.render(f"Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
+        s=self.hud_font.render(f"Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
         self.screen.blit(s,(6,4))
+        self._draw_lives()
         if self.game_over:
             self._msg("CRASHED!",(220,60,60))
         if self.won:
             self._msg("YOU MADE IT!",(80,220,80))
         pygame.display.flip()
+
+    def _draw_lives(self):
+        # right-aligned row of hearts: red = life remaining, grey = life lost
+        for i in range(MAX_LIVES):
+            cx=WIDTH-12-(MAX_LIVES-1-i)*HEART_SPACING
+            self._draw_heart(cx,13,(230,50,70) if i<self.lives else (90,90,90))
+
+    def _draw_heart(self,cx,cy,color):
+        r=5
+        pygame.draw.circle(self.screen,color,(cx-r,cy-2),r)
+        pygame.draw.circle(self.screen,color,(cx+r,cy-2),r)
+        pygame.draw.polygon(self.screen,color,[(cx-9,cy),(cx+9,cy),(cx,cy+10)])
 
     def _msg(self,text,color):
         ov=pygame.Surface((WIDTH,HEIGHT),pygame.SRCALPHA)
