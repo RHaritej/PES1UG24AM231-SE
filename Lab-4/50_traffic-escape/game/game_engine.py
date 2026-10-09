@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 from game.player import Player, LANE_W
 from game.traffic import make_car
 from game.log import Log
@@ -10,6 +11,7 @@ WIDTH = LANES * LANE_W
 HEIGHT = 600
 FPS = 60
 BG = (60, 60, 60)
+DAY_NIGHT_INTERVAL = 30.0  # Required 30-second interval per README
 
 # A horizontal water crossing; cars are drawn underneath it and do not collide
 # with the player while the player is in the water.
@@ -28,6 +30,8 @@ class GameEngine:
         self.small_font = pygame.font.SysFont("monospace", 17, bold=True)
         self.big_font = pygame.font.SysFont("monospace", 44, bold=True)
         self.high_scores = load_scores()
+        self.cycle_start_time = time.monotonic()
+        self.is_night = False
         self.reset()
 
     def reset(self):
@@ -52,6 +56,17 @@ class GameEngine:
         self.riding_log = None
         self._riding_log_x = 0
         self.score_recorded = False
+
+    def _update_day_night(self, elapsed_seconds=None):
+        """Update the day/night phase using elapsed real seconds.
+
+        elapsed_seconds is optional to make the 30-second transition easy to
+        verify in tests without changing the production interval.
+        """
+        if elapsed_seconds is None:
+            elapsed_seconds = time.monotonic() - self.cycle_start_time
+        phase = int(max(0.0, elapsed_seconds) // DAY_NIGHT_INTERVAL) % 2
+        self.is_night = (phase == 1)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -88,6 +103,7 @@ class GameEngine:
         self.respawn_invulnerability = 60
 
     def update(self):
+        self._update_day_night()
         if self.game_over or self.won:
             return
 
@@ -141,30 +157,41 @@ class GameEngine:
             self._record_finished_run()
 
     def draw(self):
-        self.screen.fill(BG)
+        # Keep the same layout, but use a strong palette change at night.
+        background = (12, 17, 32) if self.is_night else BG
+        road_marking = (65, 76, 105) if self.is_night else (100, 100, 100)
+        lane_paint = (105, 105, 75) if self.is_night else (200, 200, 100)
+        sidewalk = (65, 68, 82) if self.is_night else (150, 130, 110)
+        water_color = (8, 35, 83) if self.is_night else WATER_COLOR
+        water_ripple = (24, 65, 125) if self.is_night else (45, 135, 185)
+        self.screen.fill(background)
 
         # Original roadway and lane markings.
         for i in range(LANES + 1):
-            pygame.draw.line(self.screen, (100, 100, 100),
+            pygame.draw.line(self.screen, road_marking,
                              (i * LANE_W, 0), (i * LANE_W, HEIGHT), 2)
         for y in range(0, HEIGHT, 60):
             for i in range(LANES):
-                pygame.draw.rect(self.screen, (200, 200, 100),
+                pygame.draw.rect(self.screen, lane_paint,
                                  pygame.Rect(i * LANE_W + LANE_W // 2 - 3, y, 6, 30))
 
-        pygame.draw.rect(self.screen, (150, 130, 110), pygame.Rect(0, HEIGHT - 50, WIDTH, 50))
-        pygame.draw.rect(self.screen, (150, 130, 110), pygame.Rect(0, 0, WIDTH, 30))
+        pygame.draw.rect(self.screen, sidewalk, pygame.Rect(0, HEIGHT - 50, WIDTH, 50))
+        pygame.draw.rect(self.screen, sidewalk, pygame.Rect(0, 0, WIDTH, 30))
 
         for car in self.cars:
-            car.draw(self.screen)
+            car.draw(self.screen, night=self.is_night)
 
         # Paint the water over the road/cars to make the crossing obvious.
-        pygame.draw.rect(self.screen, WATER_COLOR,
+        pygame.draw.rect(self.screen, water_color,
                          pygame.Rect(0, WATER_TOP, WIDTH, WATER_BOTTOM - WATER_TOP))
         for y in range(WATER_TOP + 12, WATER_BOTTOM, 24):
-            pygame.draw.line(self.screen, (45, 135, 185), (0, y), (WIDTH, y), 1)
+            pygame.draw.line(self.screen, water_ripple, (0, y), (WIDTH, y), 1)
         label = self.font.render("WATER: stay on a moving log!", True, (245, 245, 245))
         self.screen.blit(label, (8, WATER_TOP - 22))
+        phase_label = "NIGHT" if self.is_night else "DAY"
+        phase_color = (255, 222, 130) if self.is_night else (255, 255, 255)
+        phase_surface = self.small_font.render(phase_label, True, phase_color)
+        self.screen.blit(phase_surface, (WIDTH - phase_surface.get_width() - 8, 42))
         for log in self.logs:
             log.draw(self.screen)
 
@@ -173,7 +200,7 @@ class GameEngine:
             self.player.draw(self.screen)
 
         hud = pygame.Rect(0, 0, WIDTH, 30)
-        pygame.draw.rect(self.screen, (20, 20, 20), hud)
+        pygame.draw.rect(self.screen, (5, 8, 18) if self.is_night else (20, 20, 20), hud)
         status = self.font.render(
             f"Score: {self.score // 10}  Lives: {self.lives}  GOAL: reach top  R=Restart",
             True, (240, 240, 240))
