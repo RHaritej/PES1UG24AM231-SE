@@ -3,6 +3,7 @@ import random
 from game.player import Player, LANE_W
 from game.traffic import make_car
 from game.log import Log
+from game.high_scores import load_scores, record_score
 
 LANES = 8
 WIDTH = LANES * LANE_W
@@ -24,7 +25,9 @@ class GameEngine:
         pygame.display.set_caption("Traffic Escape")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("monospace", 19, bold=True)
+        self.small_font = pygame.font.SysFont("monospace", 17, bold=True)
         self.big_font = pygame.font.SysFont("monospace", 44, bold=True)
+        self.high_scores = load_scores()
         self.reset()
 
     def reset(self):
@@ -47,6 +50,8 @@ class GameEngine:
         self.won = False
         self.respawn_invulnerability = 0
         self.riding_log = None
+        self._riding_log_x = 0
+        self.score_recorded = False
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -59,18 +64,28 @@ class GameEngine:
     def _in_water(self):
         return self.player.rect.centery >= WATER_TOP and self.player.rect.centery < WATER_BOTTOM
 
+    def _record_finished_run(self):
+        """Persist a run exactly once, when it ends by loss or victory."""
+        if self.score_recorded:
+            return
+        # The HUD's score is measured in tenths of a second/frame groups.
+        self.high_scores = record_score(self.score // 10)
+        self.score_recorded = True
+
     def _lose_life(self):
         """Lose one life once, then respawn outside the hazard area."""
         if self.respawn_invulnerability > 0 or self.game_over:
             return
         self.lives -= 1
         self.riding_log = None
-        self.player.rect.center = (WIDTH // 2, HEIGHT - 80)
-        self.player.move_cooldown = 12
-        self.respawn_invulnerability = 60
         if self.lives <= 0:
             self.lives = 0
             self.game_over = True
+            self._record_finished_run()
+            return
+        self.player.rect.center = (WIDTH // 2, HEIGHT - 80)
+        self.player.move_cooldown = 12
+        self.respawn_invulnerability = 60
 
     def update(self):
         if self.game_over or self.won:
@@ -85,10 +100,8 @@ class GameEngine:
 
         keys = pygame.key.get_pressed()
         was_in_water = self._in_water()
-        previous_player_x = self.player.rect.x
         if was_in_water and self.riding_log is not None:
-            # Ride the platform, then allow the player to make a hop.
-            dx = self.riding_log.rect.x - getattr(self, "_riding_log_x", self.riding_log.rect.x)
+            dx = self.riding_log.rect.x - self._riding_log_x
             self.player.rect.x += dx
             self.player.rect.x = max(0, min(WIDTH - self.player.rect.width, self.player.rect.x))
         self.player.move(keys, 0, WIDTH)
@@ -97,7 +110,8 @@ class GameEngine:
         self.riding_log = None
         if self._in_water():
             for log in self.logs:
-                if log.rect.colliderect(self.player.rect) and log.rect.left <= self.player.rect.centerx <= log.rect.right:
+                if (log.rect.colliderect(self.player.rect)
+                        and log.rect.left <= self.player.rect.centerx <= log.rect.right):
                     self.riding_log = log
                     break
             if self.riding_log is None:
@@ -124,6 +138,7 @@ class GameEngine:
             self.speed = min(10, self.speed + 0.5)
         if self.player.rect.top <= 30:
             self.won = True
+            self._record_finished_run()
 
     def draw(self):
         self.screen.fill(BG)
@@ -166,18 +181,33 @@ class GameEngine:
 
         if self.game_over:
             self._msg("GAME OVER!", (220, 60, 60))
-        if self.won:
+        elif self.won:
             self._msg("YOU MADE IT!", (80, 220, 80))
         pygame.display.flip()
 
     def _msg(self, text, color):
         overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))
+        overlay.fill((0, 0, 0, 190))
         self.screen.blit(overlay, (0, 0))
         message = self.big_font.render(text, True, color)
-        sub = self.font.render("Press R to Restart", True, (230, 230, 230))
-        self.screen.blit(message, (WIDTH // 2 - message.get_width() // 2, HEIGHT // 2 - 40))
-        self.screen.blit(sub, (WIDTH // 2 - sub.get_width() // 2, HEIGHT // 2 + 20))
+        self.screen.blit(message, (WIDTH // 2 - message.get_width() // 2, 125))
+
+        final_score = self.small_font.render(
+            f"Your score: {self.score // 10}", True, (245, 245, 245))
+        self.screen.blit(final_score, (WIDTH // 2 - final_score.get_width() // 2, 190))
+
+        title = self.font.render("TOP 5 HIGH SCORES", True, (255, 220, 100))
+        self.screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 235))
+        if not self.high_scores:
+            empty = self.small_font.render("No scores saved yet", True, (220, 220, 220))
+            self.screen.blit(empty, (WIDTH // 2 - empty.get_width() // 2, 275))
+        else:
+            for index, score in enumerate(self.high_scores[:5], start=1):
+                row = self.small_font.render(f"{index}.  {score}", True, (245, 245, 245))
+                self.screen.blit(row, (WIDTH // 2 - row.get_width() // 2, 270 + (index - 1) * 27))
+
+        sub = self.font.render("Press R to Restart", True, (200, 200, 200))
+        self.screen.blit(sub, (WIDTH // 2 - sub.get_width() // 2, 440))
 
     def run(self):
         running = True
