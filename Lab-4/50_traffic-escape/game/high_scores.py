@@ -1,5 +1,6 @@
 """Persistent top-five score storage for Traffic Escape."""
 import json
+import math
 from pathlib import Path
 
 # Predictable location: the project root, alongside main.py.
