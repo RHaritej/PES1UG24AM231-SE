@@ -1,0 +1,9 @@
+restaurant_order_system.py:6:1: F401 'math' imported but unused
+restaurant_order_system.py:18:80: E501 line too long (110 > 79 characters)
+restaurant_order_system.py:19:80: E501 line too long (85 > 79 characters)
+restaurant_order_system.py:26:5: E722 do not use bare 'except'
+restaurant_order_system.py:31:5: F841 local variable 'service_tax' is assigned to but never used
+restaurant_order_system.py:32:29: E711 comparison to None should be 'if cond is None:'
+restaurant_order_system.py:41:5: F841 local variable 'base_bill' is assigned to but never used
+restaurant_order_system.py:75:80: E501 line too long (80 > 79 characters)
+restaurant_order_system.py:83:7: W292 no newline at end of file
