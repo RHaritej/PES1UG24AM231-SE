@@ -28,6 +28,13 @@ class SecurityTests(unittest.TestCase):
     def test_ticket_hash_is_sha256_length(self):
         self.assertEqual(len(generate_ticket_hash("T1")), 64)
 
+    def test_expression_string_is_rejected(self):
+        """Reject expression strings instead of evaluating them."""
+        with self.assertRaises(TypeError):
+            calculate_discounted_bill(
+                "T1",
+                "__import__('os').system('echo unsafe')",
+            )
 
 if __name__ == "__main__":
     unittest.main()
