@@ -1,0 +1,137 @@
+<svg viewBox="0 0 1200 820" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowOpen" markerWidth="12" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="820" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">
+    UML Use-Case Diagram — Automated Rubric Assignment Evaluator
+  </text>
+
+  <!-- System boundary -->
+  <rect x="170" y="55" width="860" height="665" rx="8" fill="#fafafa" stroke="#4b5563" stroke-width="1.6"/>
+  <text x="600" y="78" text-anchor="middle" font-size="13.5" font-weight="600" fill="#374151">
+    «system» Automated Rubric Assignment Evaluator
+  </text>
+
+  <!-- ===================== ACTORS ===================== -->
+  <!-- Student -->
+  <g stroke="#1f2937" stroke-width="2.2" fill="none">
+    <circle cx="60" cy="335" r="15"/>
+    <line x1="60" y1="350" x2="60" y2="398"/>
+    <line x1="28" y1="372" x2="92" y2="372"/>
+    <line x1="60" y1="398" x2="32" y2="435"/>
+    <line x1="60" y1="398" x2="88" y2="435"/>
+  </g>
+  <text x="60" y="458" text-anchor="middle" font-size="13.5" font-weight="600" fill="#111827">Student</text>
+
+  <!-- Faculty Evaluator -->
+  <g stroke="#1f2937" stroke-width="2.2" fill="none">
+    <circle cx="1140" cy="335" r="15"/>
+    <line x1="1140" y1="350" x2="1140" y2="398"/>
+    <line x1="1108" y1="372" x2="1172" y2="372"/>
+    <line x1="1140" y1="398" x2="1112" y2="435"/>
+    <line x1="1140" y1="398" x2="1168" y2="435"/>
+  </g>
+  <text x="1140" y="458" text-anchor="middle" font-size="13.5" font-weight="600" fill="#111827">Faculty Evaluator</text>
+
+  <!-- ===================== COLUMN HEADERS ===================== -->
+  <text x="340" y="108" text-anchor="middle" font-size="11" font-style="italic" fill="#6b7280">Student-facing</text>
+  <text x="630" y="108" text-anchor="middle" font-size="11" font-style="italic" fill="#6b7280">Internal (system-triggered)</text>
+  <text x="900" y="108" text-anchor="middle" font-size="11" font-style="italic" fill="#6b7280">Evaluator-facing</text>
+
+  <!-- ===================== COLUMN A — Student ===================== -->
+  <!-- A1 Upload Project Submission -->
+  <ellipse cx="340" cy="150" rx="110" ry="45" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.6"/>
+  <text x="340" y="146" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Upload Project</text>
+  <text x="340" y="161" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Submission</text>
+
+  <!-- A2 Request Resubmission -->
+  <ellipse cx="340" cy="320" rx="110" ry="45" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.6"/>
+  <text x="340" y="316" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Request</text>
+  <text x="340" y="331" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Resubmission</text>
+
+  <!-- A3 View Rubric Results -->
+  <ellipse cx="340" cy="490" rx="110" ry="45" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.6"/>
+  <text x="340" y="486" text-anchor="middle" font-size="12.5" fill="#0c4a6e">View Rubric</text>
+  <text x="340" y="501" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Results</text>
+
+  <!-- A4 Submit Peer Review -->
+  <ellipse cx="340" cy="660" rx="110" ry="45" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.6"/>
+  <text x="340" y="656" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Submit Peer</text>
+  <text x="340" y="671" text-anchor="middle" font-size="12.5" fill="#0c4a6e">Review</text>
+
+  <!-- ===================== COLUMN B — Internal ===================== -->
+  <!-- B1 Execute Test Suite -->
+  <ellipse cx="630" cy="150" rx="110" ry="45" fill="#f3f4f6" stroke="#4b5563" stroke-width="1.6"/>
+  <text x="630" y="155" text-anchor="middle" font-size="12.5" fill="#1f2937">Execute Test Suite</text>
+
+  <!-- B2 Generate Rubric Score Breakdown -->
+  <ellipse cx="630" cy="320" rx="110" ry="45" fill="#f3f4f6" stroke="#4b5563" stroke-width="1.6"/>
+  <text x="630" y="316" text-anchor="middle" font-size="12" fill="#1f2937">Generate Rubric</text>
+  <text x="630" y="331" text-anchor="middle" font-size="12" fill="#1f2937">Score Breakdown</text>
+
+  <!-- B3 Assign Peer Reviews -->
+  <ellipse cx="630" cy="490" rx="110" ry="45" fill="#f3f4f6" stroke="#4b5563" stroke-width="1.6"/>
+  <text x="630" y="486" text-anchor="middle" font-size="12.5" fill="#1f2937">Assign Peer</text>
+  <text x="630" y="501" text-anchor="middle" font-size="12.5" fill="#1f2937">Reviews</text>
+
+  <!-- ===================== COLUMN C — Faculty ===================== -->
+  <!-- C1 Override Rubric Score -->
+  <ellipse cx="900" cy="320" rx="110" ry="45" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.6"/>
+  <text x="900" y="316" text-anchor="middle" font-size="12.5" fill="#7f1d1d">Override Rubric</text>
+  <text x="900" y="331" text-anchor="middle" font-size="12.5" fill="#7f1d1d">Score</text>
+
+  <!-- C2 View Analytics Dashboard -->
+  <ellipse cx="900" cy="490" rx="110" ry="45" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.6"/>
+  <text x="900" y="486" text-anchor="middle" font-size="12.5" fill="#7f1d1d">View Analytics</text>
+  <text x="900" y="501" text-anchor="middle" font-size="12.5" fill="#7f1d1d">Dashboard</text>
+
+  <!-- ===================== ASSOCIATIONS (plain solid lines) ===================== -->
+  <g stroke="#6b7280" stroke-width="1.4">
+    <line x1="95" y1="380" x2="230" y2="160"/>
+    <line x1="95" y1="390" x2="230" y2="320"/>
+    <line x1="95" y1="400" x2="230" y2="490"/>
+    <line x1="95" y1="410" x2="230" y2="655"/>
+
+    <line x1="1105" y1="380" x2="1010" y2="320"/>
+    <line x1="1105" y1="400" x2="1010" y2="490"/>
+  </g>
+
+  <!-- ===================== INCLUDE / EXTEND RELATIONSHIPS ===================== -->
+  <!-- A1 include B1 (straight, same row) -->
+  <line x1="450" y1="150" x2="520" y2="150" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+  <text x="485" y="138" text-anchor="middle" font-size="11.5" font-style="italic" fill="#374151">«include»</text>
+
+  <!-- B1 include B2 (straight, same column) -->
+  <line x1="630" y1="195" x2="630" y2="275" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+  <text x="675" y="238" text-anchor="middle" font-size="11.5" font-style="italic" fill="#374151">«include»</text>
+
+  <!-- A1 include B3 (curved through the A-B gap corridor) -->
+  <path d="M 450,168 C 500,230 500,420 520,478" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+  <text x="465" y="320" text-anchor="middle" font-size="11.5" font-style="italic" fill="#374151" transform="rotate(-90 465 320)">«include»</text>
+
+  <!-- A2 extend A1 (short, same column) -->
+  <line x1="340" y1="275" x2="340" y2="195" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+  <text x="392" y="238" text-anchor="middle" font-size="11.5" font-style="italic" fill="#374151">«extend»</text>
+
+  <!-- C1 extend B2 (straight, same row) -->
+  <line x1="790" y1="320" x2="740" y2="320" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+  <text x="765" y="308" text-anchor="middle" font-size="11.5" font-style="italic" fill="#374151">«extend»</text>
+
+  <!-- ===================== LEGEND ===================== -->
+  <g font-size="12" fill="#374151">
+    <line x1="230" y1="748" x2="270" y2="748" stroke="#6b7280" stroke-width="1.4"/>
+    <text x="280" y="752">Actor association</text>
+
+    <line x1="440" y1="748" x2="480" y2="748" stroke="#333333" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowOpen)"/>
+    <text x="490" y="752">«include» (base → included) / «extend» (extension → base)</text>
+  </g>
+  <text x="600" y="800" text-anchor="middle" font-size="11" fill="#9ca3af">
+    Columns group use cases by who triggers them: Student (left), system-internal steps (centre), Faculty Evaluator (right).
+  </text>
+</svg>
